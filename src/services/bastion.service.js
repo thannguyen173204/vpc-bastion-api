@@ -7,7 +7,7 @@ const { Server, Client } = pkg;
 
 class BastionService {
     constructor() {
-        this.port = 2222;
+        this.port = process.env.BASTION_SSH_PORT;
         // LƯU Ý: Đặt key vào thư mục data để dùng Docker Volume
         this.hostKeyPath = '/app/data/bastion.key'; 
     }
@@ -19,7 +19,7 @@ class BastionService {
         }
 
         if (!fs.existsSync(this.hostKeyPath)) {
-            console.log("🔑 Đang khởi tạo SSH Host Key mới...");
+            console.log("Đang khởi tạo SSH Host Key mới...");
             const { privateKey } = generateKeyPairSync('rsa', {
                 modulusLength: 2048,
                 publicKeyEncoding: { type: 'pkcs1', format: 'pem' },
@@ -51,24 +51,24 @@ class BastionService {
                     const targetVmName = parts[1].trim();
                     targetPassword = ctx.password;
 
-                    console.log(`\n🛡️ [Bastion] Yêu cầu kết nối: User="${targetUsername}", VM="${targetVmName}"`);
+                    console.log(`\n Bastion] Yêu cầu kết nối: User="${targetUsername}", VM="${targetVmName}"`);
 
                     const vm = await Vm.findOne({ vm_name: targetVmName });
                     if (!vm || vm.status !== 'running') {
-                        console.error(`❌ [Bastion] Từ chối: Không tìm thấy VM [${targetVmName}] đang chạy.`);
+                        console.error(`[Bastion] Từ chối: Không tìm thấy VM [${targetVmName}] đang chạy.`);
                         return ctx.reject(['password']);
                     }
 
                     targetVmIp = vm.ip_address;
-                    console.log(`✅ [Bastion] Tìm thấy [${targetVmName}] (IP: ${targetVmIp}). Đang kết nối nội bộ...`);
+                    console.log(`[Bastion] Tìm thấy [${targetVmName}] (IP: ${targetVmIp}). Đang kết nối nội bộ...`);
 
                     proxyClient.removeAllListeners();
 
                     proxyClient.on('ready', () => {
-                        console.log(`✅ [Bastion] Đăng nhập VM thành công! Đang cấp Shell...`);
+                        console.log(`[Bastion] Đăng nhập VM thành công! Đang cấp Shell...`);
                         ctx.accept(); 
                     }).on('error', (err) => {
-                        console.error(`❌ [Bastion -> VM] Lỗi kết nối: ${err.message}`);
+                        console.error(`[Bastion -> VM] Lỗi kết nối: ${err.message}`);
                         ctx.reject(['password']);
                     }).on('keyboard-interactive', (name, instr, instrLang, prompts, finish) => {
                         finish([targetPassword]);
@@ -114,7 +114,7 @@ class BastionService {
         });
 
         server.listen(this.port, '0.0.0.0', () => {
-            console.log(`🛡️ Bastion SSH Proxy đang chạy ở port ${this.port}`);
+            console.log(`astion SSH Proxy đang chạy ở port ${this.port}`);
         });
     }
 }

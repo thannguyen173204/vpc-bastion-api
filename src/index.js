@@ -6,21 +6,19 @@ import BastionService from './services/bastion.service.js';
 dotenv.config();
 
 const app = express();
-const port = process.env.PORT || 2223;
+const port = process.env.BASTION_API_PORT;
 
-// API Health check nhỏ để xem container có sống không
 app.get('/health', (req, res) => res.json({ status: 'Bastion is alive' }));
 
 mongoose.connect(process.env.DB_URL)
     .then(() => {
-        console.log('✅ Bastion đã kết nối Database thành công!');
+        console.log('Bastion đã kết nối Database thành công!');
         app.listen(port, () => {
-            console.log(`✅ Bastion Health-check API chạy ở port ${port}`);
-            // Bật server SSH ngay sau khi có DB
+            console.log(`Bastion Health-check API chạy ở port ${port}`);
             BastionService.start();
         });
     })
     .catch((err) => {
-        console.error('❌ Lỗi kết nối DB:', err);
+        console.error('Lỗi kết nối DB:', err);
         process.exit(1);
     });
