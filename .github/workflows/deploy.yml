@@ -18,7 +18,7 @@ jobs:
       - name: build and restart
         run: |
           cd ~/server
-          docker-compose up -d --build bastion
+          docker compose up -d --build bastion
 
       - name: clean up
         run: docker image prune -f
