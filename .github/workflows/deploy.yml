@@ -13,7 +13,7 @@ jobs:
 
       - name: sync
         run: |
-          rsync -av --deletes ./ ~/server/bastion/
+          rsync -av --delete ./ ~/server/bastion/
 
       - name: build and restart
         run: |
